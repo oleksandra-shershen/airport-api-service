@@ -24,3 +24,15 @@ class AirplaneSerializer(serializers.ModelSerializer):
     class Meta:
         model = Airplane
         fields = ("id", "name")
+
+
+class AirplaneTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AirplaneType
+        fields = ("id", "name")
+
+
+class CrewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Crew
+        fields = ("id", "first_name", "last_name", "full_name")
