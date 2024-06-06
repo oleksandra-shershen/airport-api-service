@@ -8,8 +8,8 @@ class Airport(models.Model):
 
 
 class Route(models.Model):
-    source = models.ForeignKey(Airport, on_delete=models.CASCADE, related_name="routes")
-    destination = models.ForeignKey(Airport, on_delete=models.CASCADE, related_name="routes")
+    source = models.ForeignKey(Airport, on_delete=models.CASCADE, related_name="source_routes")
+    destination = models.ForeignKey(Airport, on_delete=models.CASCADE, related_name="destination_routes")
     distance = models.IntegerField()
 
 
@@ -24,16 +24,17 @@ class Airplane(models.Model):
     airplane_type = models.ForeignKey(AirplaneType, on_delete=models.CASCADE, related_name="airplanes")
 
 
+class Crew(models.Model):
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+
+
 class Flight(models.Model):
     route = models.ForeignKey(Route, on_delete=models.CASCADE, related_name="flights")
     airplane = models.ForeignKey(Airplane, on_delete=models.CASCADE, related_name="flights")
     departure_time = models.DateTimeField()
     arrival_time = models.DateTimeField()
-
-
-class Crew(models.Model):
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
+    crews = models.ManyToManyField(Crew, blank=True)
 
 
 class Order(models.Model):
