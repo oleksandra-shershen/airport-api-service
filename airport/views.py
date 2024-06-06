@@ -8,10 +8,10 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from airport.models import Airport
+from airport.models import Airport, AirplaneType, Airplane
 
 from airport.serializers import (
-    AirportSerializer
+    AirportSerializer, AirplaneSerializer
 )
 
 
@@ -22,4 +22,13 @@ class AirportViewSet(
 ):
     queryset = Airport.objects.all()
     serializer_class = AirportSerializer
+
+
+class AirplaneViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    GenericViewSet,
+):
+    queryset = Airplane.objects.all()
+    serializer_class = AirplaneSerializer
 
