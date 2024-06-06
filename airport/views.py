@@ -11,7 +11,8 @@ from rest_framework.viewsets import GenericViewSet
 from airport.models import Airport, AirplaneType, Airplane, Crew
 
 from airport.serializers import (
-    AirportSerializer, AirplaneSerializer, AirplaneTypeSerializer, CrewSerializer
+    AirportSerializer, AirplaneSerializer, AirplaneTypeSerializer, CrewSerializer, AirplaneListSerializer,
+    AirplaneRetrieveSerializer
 )
 
 
@@ -22,15 +23,6 @@ class AirportViewSet(
 ):
     queryset = Airport.objects.all()
     serializer_class = AirportSerializer
-
-
-class AirplaneViewSet(
-    mixins.CreateModelMixin,
-    mixins.ListModelMixin,
-    GenericViewSet,
-):
-    queryset = Airplane.objects.all()
-    serializer_class = AirplaneSerializer
 
 
 class AirplaneTypeViewSet(
@@ -50,3 +42,16 @@ class CrewViewSet(
     queryset = Crew.objects.all()
     serializer_class = CrewSerializer
 
+
+class AirplaneViewSet(viewsets.ModelViewSet):
+    queryset = Airplane.objects.all().select_related("airplane_type")
+
+    def get_queryset(self):
+        return self.queryset
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return AirplaneListSerializer
+        elif self.action == "retrieve":
+            return AirplaneRetrieveSerializer
+        return AirplaneSerializer

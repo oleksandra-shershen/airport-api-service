@@ -10,7 +10,6 @@ from airport.models import (
     Order,
     Flight,
     Crew,
-
 )
 
 
@@ -18,12 +17,6 @@ class AirportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Airport
         fields = ("id", "name", "closest_big_city")
-
-
-class AirplaneSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Airplane
-        fields = ("id", "name")
 
 
 class AirplaneTypeSerializer(serializers.ModelSerializer):
@@ -36,3 +29,25 @@ class CrewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Crew
         fields = ("id", "first_name", "last_name", "full_name")
+
+
+class AirplaneSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Airplane
+        fields = ("id", "name", "rows", "seats_in_row", "airplane_type", "capacity")
+
+
+class AirplaneListSerializer(serializers.ModelSerializer):
+    airplane_type = AirplaneTypeSerializer()
+
+    class Meta:
+        model = Airplane
+        fields = ("id", "name", "airplane_type", "capacity")
+
+
+class AirplaneRetrieveSerializer(serializers.ModelSerializer):
+    airplane_type = AirplaneTypeSerializer()
+
+    class Meta:
+        model = Airplane
+        fields = ("id", "name", "rows", "seats_in_row", "airplane_type", "capacity")
