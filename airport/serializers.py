@@ -45,7 +45,7 @@ class AirplaneListSerializer(serializers.ModelSerializer):
         fields = ("id", "name", "airplane_type", "capacity")
 
 
-class AirplaneRetrieveSerializer(serializers.ModelSerializer):
+class AirplaneDetailSerializer(serializers.ModelSerializer):
     airplane_type = AirplaneTypeSerializer()
 
     class Meta:
