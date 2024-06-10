@@ -3,12 +3,13 @@ from datetime import datetime
 from django.db.models import F, Count
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
+from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from airport.models import Airport, AirplaneType, Airplane, Crew, Route, Flight
+from airport.models import Airport, AirplaneType, Airplane, Crew, Route, Flight, Order
 
 from airport.serializers import (
     AirportSerializer,
@@ -22,7 +23,7 @@ from airport.serializers import (
     RouteSerializer,
     FlightListSerializer,
     FlightDetailSerializer,
-    FlightSerializer,
+    FlightSerializer, OrderSerializer, OrderListSerializer, OrderDetailSerializer,
 )
 
 
@@ -82,8 +83,8 @@ class FlightViewSet(viewsets.ModelViewSet):
         .prefetch_related("crews")
         .annotate(
             tickets_available=(
-                F("airplane__rows") * F("airplane__seats_in_row")
-                - Count("tickets")
+                    F("airplane__rows") * F("airplane__seats_in_row")
+                    - Count("tickets")
             )
         )
     )
@@ -108,3 +109,33 @@ class FlightViewSet(viewsets.ModelViewSet):
         elif self.action == "retrieve":
             return FlightDetailSerializer
         return FlightSerializer
+
+
+class OrderPagination(PageNumberPagination):
+    page_size = 10
+    max_page_size = 100
+
+
+class OrderViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    viewsets.GenericViewSet,
+):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    pagination_class = OrderPagination
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user).prefetch_related(
+            "tickets__flight__route", "tickets__flight__airplane"
+        )
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return OrderListSerializer
+        return OrderSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
