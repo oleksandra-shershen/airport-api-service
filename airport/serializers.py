@@ -94,10 +94,11 @@ class FlightListSerializer(FlightSerializer):
     airplane = serializers.StringRelatedField()
     departure_time = serializers.DateTimeField(format="%Y-%m-%d %H:%M")
     arrival_time = serializers.DateTimeField(format="%Y-%m-%d %H:%M")
+    tickets_available = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Flight
-        fields = ("id", "route", "airplane", "departure_time", "arrival_time")
+        fields = ("id", "route", "airplane", "departure_time", "arrival_time", "tickets_available")
 
 
 class FlightDetailSerializer(serializers.ModelSerializer):

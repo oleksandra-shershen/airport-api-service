@@ -67,7 +67,31 @@ class RouteViewSet(viewsets.ModelViewSet):
 
 
 class FlightViewSet(viewsets.ModelViewSet):
-    queryset = Flight.objects.all().select_related("route", "airplane").prefetch_related("crews")
+    queryset = (
+        Flight.objects.all()
+        .select_related("route", "airplane")
+        .prefetch_related("crews")
+        .annotate(
+            tickets_available=(
+                    F("airplane__rows") * F("airplane__seats_in_row")
+                    - Count("tickets")
+            )
+        )
+    )
+
+    def get_queryset(self):
+        queryset = self.queryset
+        date = self.request.query_params.get("date")
+        route_id_str = self.request.query_params.get("route")
+
+        if date:
+            date = datetime.strptime(date, "%Y-%m-%d").date()
+            queryset = queryset.filter(departure_time__date=date)
+
+        if route_id_str:
+            queryset = queryset.filter(route_id=int(route_id_str))
+
+        return queryset
 
     def get_serializer_class(self):
         if self.action == "list":
