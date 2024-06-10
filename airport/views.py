@@ -89,20 +89,6 @@ class FlightViewSet(viewsets.ModelViewSet):
         )
     )
 
-    def get_queryset(self):
-        queryset = self.queryset
-        date = self.request.query_params.get("date")
-        route_id_str = self.request.query_params.get("route")
-
-        if date:
-            date = datetime.strptime(date, "%Y-%m-%d").date()
-            queryset = queryset.filter(departure_time__date=date)
-
-        if route_id_str:
-            queryset = queryset.filter(route_id=int(route_id_str))
-
-        return queryset
-
     def get_serializer_class(self):
         if self.action == "list":
             return FlightListSerializer
@@ -138,4 +124,3 @@ class OrderViewSet(
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-
