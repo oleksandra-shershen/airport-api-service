@@ -11,9 +11,18 @@ from rest_framework.viewsets import GenericViewSet
 from airport.models import Airport, AirplaneType, Airplane, Crew, Route, Flight
 
 from airport.serializers import (
-    AirportSerializer, AirplaneSerializer, AirplaneTypeSerializer, CrewSerializer, AirplaneListSerializer,
-    AirplaneDetailSerializer, RouteListSerializer, RouteDetailSerializer, RouteSerializer, FlightListSerializer,
-    FlightDetailSerializer, FlightSerializer
+    AirportSerializer,
+    AirplaneSerializer,
+    AirplaneTypeSerializer,
+    CrewSerializer,
+    AirplaneListSerializer,
+    AirplaneDetailSerializer,
+    RouteListSerializer,
+    RouteDetailSerializer,
+    RouteSerializer,
+    FlightListSerializer,
+    FlightDetailSerializer,
+    FlightSerializer,
 )
 
 
@@ -73,8 +82,8 @@ class FlightViewSet(viewsets.ModelViewSet):
         .prefetch_related("crews")
         .annotate(
             tickets_available=(
-                    F("airplane__rows") * F("airplane__seats_in_row")
-                    - Count("tickets")
+                F("airplane__rows") * F("airplane__seats_in_row")
+                - Count("tickets")
             )
         )
     )

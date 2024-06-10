@@ -20,4 +20,3 @@ admin.site.register(Ticket)
 admin.site.register(Flight)
 admin.site.register(Crew)
 admin.site.register(Airplane)
-

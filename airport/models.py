@@ -16,8 +16,12 @@ class Airport(models.Model):
 
 
 class Route(models.Model):
-    source = models.ForeignKey(Airport, on_delete=models.CASCADE, related_name="source_routes")
-    destination = models.ForeignKey(Airport, on_delete=models.CASCADE, related_name="destination_routes")
+    source = models.ForeignKey(
+        Airport, on_delete=models.CASCADE, related_name="source_routes"
+    )
+    destination = models.ForeignKey(
+        Airport, on_delete=models.CASCADE, related_name="destination_routes"
+    )
     distance = models.IntegerField()
 
     def __str__(self) -> str:
@@ -42,7 +46,9 @@ class Airplane(models.Model):
     name = models.CharField(max_length=255)
     rows = models.IntegerField()
     seats_in_row = models.IntegerField()
-    airplane_type = models.ForeignKey(AirplaneType, on_delete=models.CASCADE, related_name="airplanes")
+    airplane_type = models.ForeignKey(
+        AirplaneType, on_delete=models.CASCADE, related_name="airplanes"
+    )
     image = models.ImageField(null=True, upload_to=airplane_image_file_path)
 
     @property
@@ -66,20 +72,33 @@ class Crew(models.Model):
 
 
 class Flight(models.Model):
-    route = models.ForeignKey(Route, on_delete=models.CASCADE, related_name="flights")
-    airplane = models.ForeignKey(Airplane, on_delete=models.CASCADE, related_name="flights")
+    route = models.ForeignKey(
+        Route,
+        on_delete=models.CASCADE,
+        related_name="flights"
+    )
+    airplane = models.ForeignKey(
+        Airplane, on_delete=models.CASCADE, related_name="flights"
+    )
     departure_time = models.DateTimeField()
     arrival_time = models.DateTimeField()
     crews = models.ManyToManyField(Crew, blank=True, related_name="flights")
 
     def __str__(self) -> str:
-        return (f"Flight {self.id} from {self.route.source} to {self.route.destination} "
-                f"on {self.departure_time.strftime('%Y-%m-%d %H:%M')}")
+        return (
+            f"Flight {self.id} from {self.route.source} "
+            f"to {self.route.destination} "
+            f"on {self.departure_time.strftime('%Y-%m-%d %H:%M')}"
+        )
 
 
 class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="orders")
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="orders"
+    )
 
     def __str__(self):
         return str(self.created_at)
@@ -91,8 +110,16 @@ class Order(models.Model):
 class Ticket(models.Model):
     row = models.IntegerField()
     seat = models.IntegerField()
-    flight = models.ForeignKey(Flight, on_delete=models.CASCADE, related_name="tickets")
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="tickets")
+    flight = models.ForeignKey(
+        Flight,
+        on_delete=models.CASCADE,
+        related_name="tickets"
+    )
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        related_name="tickets"
+    )
 
     @staticmethod
     def validate_ticket(row, seat, airplane, error_to_raise):
@@ -104,7 +131,9 @@ class Ticket(models.Model):
             if not (1 <= ticket_attr_value <= count_attrs):
                 raise error_to_raise(
                     {
-                        ticket_attr_name: f"{ticket_attr_name} number must be in available range: (1, {count_attrs})"
+                        ticket_attr_name: f"{ticket_attr_name} number "
+                                          f"must be in available range: "
+                                          f"(1, {count_attrs})"
                     }
                 )
 
@@ -116,7 +145,13 @@ class Ticket(models.Model):
             ValidationError
         )
 
-    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+    def save(
+            self,
+            force_insert=False,
+            force_update=False,
+            using=None,
+            update_fields=None
+    ):
         self.full_clean()
         return super().save(force_insert, force_update, using, update_fields)
 
