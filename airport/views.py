@@ -44,15 +44,12 @@ class CrewViewSet(
 
 
 class AirplaneViewSet(viewsets.ModelViewSet):
-    queryset = Airplane.objects.all().select_related("airplane_type")
-
-    def get_queryset(self):
-        return self.queryset
+    queryset = Airplane.objects.all()
 
     def get_serializer_class(self):
-        if self.action == "list":
+        if self.action == 'list':
             return AirplaneListSerializer
-        elif self.action == "retrieve":
+        elif self.action == 'retrieve':
             return AirplaneDetailSerializer
         return AirplaneSerializer
 
