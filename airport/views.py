@@ -8,11 +8,12 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from airport.models import Airport, AirplaneType, Airplane, Crew, Route
+from airport.models import Airport, AirplaneType, Airplane, Crew, Route, Flight
 
 from airport.serializers import (
     AirportSerializer, AirplaneSerializer, AirplaneTypeSerializer, CrewSerializer, AirplaneListSerializer,
-    AirplaneDetailSerializer, RouteListSerializer, RouteDetailSerializer, RouteSerializer
+    AirplaneDetailSerializer, RouteListSerializer, RouteDetailSerializer, RouteSerializer, FlightListSerializer,
+    FlightDetailSerializer, FlightSerializer
 )
 
 
@@ -63,3 +64,14 @@ class RouteViewSet(viewsets.ModelViewSet):
         elif self.action == "retrieve":
             return RouteDetailSerializer
         return RouteSerializer
+
+
+class FlightViewSet(viewsets.ModelViewSet):
+    queryset = Flight.objects.all().select_related("route", "airplane").prefetch_related("crews")
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return FlightListSerializer
+        elif self.action == "retrieve":
+            return FlightDetailSerializer
+        return FlightSerializer
