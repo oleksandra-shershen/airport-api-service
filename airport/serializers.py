@@ -98,14 +98,7 @@ class FlightSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Flight
-        fields = (
-            "id",
-            "route",
-            "airplane",
-            "departure_time",
-            "arrival_time",
-            "crews"
-        )
+        fields = ("id", "route", "airplane", "departure_time", "arrival_time", "crews")
 
     def validate(self, attrs):
         if attrs["departure_time"] >= attrs["arrival_time"]:
@@ -136,10 +129,7 @@ class TicketSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         data = super(TicketSerializer, self).validate(attrs=attrs)
         Ticket.validate_ticket(
-            attrs["row"],
-            attrs["seat"],
-            attrs["flight"].airplane,
-            ValidationError
+            attrs["row"], attrs["seat"], attrs["flight"].airplane, ValidationError
         )
         return data
 
@@ -162,9 +152,7 @@ class FlightDetailSerializer(serializers.ModelSerializer):
     route = RouteDetailSerializer()
     airplane = AirplaneDetailSerializer()
     crews = CrewSerializer(many=True)
-    taken_places = TicketSeatsSerializer(
-        source="tickets", many=True, read_only=True
-    )
+    taken_places = TicketSeatsSerializer(source="tickets", many=True, read_only=True)
 
     class Meta:
         model = Flight
@@ -197,6 +185,24 @@ class OrderSerializer(serializers.ModelSerializer):
             for ticket_data in tickets_data:
                 Ticket.objects.create(order=order, **ticket_data)
             return order
+
+    def validate(self, attrs):
+        flight = attrs["tickets"][0]["flight"]
+        total_seats = flight.airplane.rows * flight.airplane.seats_in_row
+        taken_seats = flight.tickets.values_list("row", "seat", flat=True)
+        for ticket in attrs["tickets"]:
+            if (ticket["row"], ticket["seat"]) in taken_seats:
+                raise ValidationError(
+                    f"Seat {ticket['row']}:{ticket['seat']} is already taken."
+                )
+            if (
+                ticket["row"] > flight.airplane.rows
+                or ticket["seat"] > flight.airplane.seats_in_row
+            ):
+                raise ValidationError(
+                    f"Seat {ticket['row']}:{ticket['seat']} is out of range for this airplane."
+                )
+        return super().validate(attrs)
 
 
 class OrderListSerializer(OrderSerializer):
