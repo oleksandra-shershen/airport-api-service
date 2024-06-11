@@ -105,7 +105,14 @@ class FlightSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Flight
-        fields = ("id", "route", "airplane", "departure_time", "arrival_time", "crews")
+        fields = (
+            "id",
+            "route",
+            "airplane",
+            "departure_time",
+            "arrival_time",
+            "crews"
+        )
 
     def validate(self, attrs):
         if attrs["departure_time"] >= attrs["arrival_time"]:
@@ -136,7 +143,10 @@ class TicketSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         data = super(TicketSerializer, self).validate(attrs=attrs)
         Ticket.validate_ticket(
-            attrs["row"], attrs["seat"], attrs["flight"].airplane, ValidationError
+            attrs["row"],
+            attrs["seat"],
+            attrs["flight"].airplane,
+            ValidationError
         )
         return data
 
@@ -159,7 +169,11 @@ class FlightDetailSerializer(serializers.ModelSerializer):
     route = RouteDetailSerializer()
     airplane = AirplaneDetailSerializer()
     crews = CrewSerializer(many=True)
-    taken_places = TicketSeatsSerializer(source="tickets", many=True, read_only=True)
+    taken_places = TicketSeatsSerializer(
+        source="tickets",
+        many=True,
+        read_only=True
+    )
 
     class Meta:
         model = Flight

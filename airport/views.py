@@ -9,7 +9,15 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from airport.models import Airport, Route, AirplaneType, Airplane, Crew, Flight, Order
+from airport.models import (
+    Airport,
+    Route,
+    AirplaneType,
+    Airplane,
+    Crew,
+    Flight,
+    Order
+)
 from airport.permissions import IsAdminOrIfAuthenticatedReadOnly
 from airport.serializers import (
     AirportSerializer,
@@ -108,7 +116,8 @@ class AirplaneViewSet(viewsets.ModelViewSet):
             OpenApiParameter(
                 "airplane_type",
                 type=OpenApiTypes.INT,
-                description="Filter by airplane type id (ex. ?airplane_type=2)",
+                description="Filter by airplane type "
+                            "id (ex. ?airplane_type=2)",
             ),
             OpenApiParameter(
                 "name",
@@ -168,7 +177,9 @@ class FlightViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(airplane__id=airplane)
         if departure_time:
             departure_datetime = datetime.strptime(departure_time, "%Y-%m-%d")
-            queryset = queryset.filter(departure_time__date=departure_datetime.date())
+            queryset = queryset.filter(
+                departure_time__date=departure_datetime.date()
+            )
 
         return queryset
 
@@ -187,7 +198,8 @@ class FlightViewSet(viewsets.ModelViewSet):
             OpenApiParameter(
                 "departure_time",
                 type=OpenApiTypes.DATE,
-                description="Filter by departure date (ex. ?departure_time=2024-06-11)",
+                description="Filter by departure date "
+                            "(ex. ?departure_time=2024-06-11)",
             ),
         ]
     )
