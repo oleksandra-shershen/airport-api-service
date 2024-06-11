@@ -107,6 +107,11 @@ class FlightSerializer(serializers.ModelSerializer):
             "crews"
         )
 
+    def validate(self, attrs):
+        if attrs["departure_time"] >= attrs["arrival_time"]:
+            raise ValidationError("Arrival time must be after departure time.")
+        return attrs
+
 
 class FlightListSerializer(FlightSerializer):
     route = serializers.StringRelatedField()
