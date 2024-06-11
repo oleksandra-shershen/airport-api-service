@@ -96,19 +96,6 @@ class FlightViewSet(viewsets.ModelViewSet):
             return FlightDetailSerializer
         return FlightSerializer
 
-    @action(detail=True, methods=["get"])
-    def available_seats(self, request, pk=None):
-        flight = self.get_object()
-        total_seats = flight.airplane.rows * flight.airplane.seats_in_row
-        taken_seats = flight.tickets.values_list("row", "seat")
-        available_seats = [
-            (row, seat)
-            for row in range(1, flight.airplane.rows + 1)
-            for seat in range(1, flight.airplane.seats_in_row + 1)
-            if (row, seat) not in taken_seats
-        ]
-        return Response(available_seats, status=status.HTTP_200_OK)
-
 
 class OrderPagination(PageNumberPagination):
     page_size = 10
@@ -137,13 +124,3 @@ class OrderViewSet(
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-
-    @action(detail=False, methods=["get"])
-    def my_orders(self, request):
-        orders = self.get_queryset()
-        page = self.paginate_queryset(orders)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        serializer = self.get_serializer(orders, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
