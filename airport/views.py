@@ -30,7 +30,6 @@ from airport.serializers import (
     AirplaneImageSerializer,
 )
 
-
 class AirportViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
@@ -41,18 +40,7 @@ class AirportViewSet(
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                "name",
-                type=OpenApiTypes.STR,
-                description="Filter by airport name (ex. ?name=JFK)",
-            ),
-            OpenApiParameter(
-                "closest_big_city",
-                type=OpenApiTypes.STR,
-                description="Filter by closest big city (ex. ?closest_big_city=New York)",
-            ),
-        ],
+        summary="Retrieve a list of airports",
         responses={
             200: OpenApiResponse(response=AirportSerializer, description="Successful response with a list of airports"),
             400: OpenApiResponse(description="Bad Request - Invalid query parameters"),
@@ -73,13 +61,7 @@ class AirplaneTypeViewSet(
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                "name",
-                type=OpenApiTypes.STR,
-                description="Filter by airplane type name (ex. ?name=Boeing 737)",
-            ),
-        ],
+        summary="Retrieve a list of airplane types",
         responses={
             200: OpenApiResponse(response=AirplaneTypeSerializer, description="Successful response with a list of airplane types"),
             400: OpenApiResponse(description="Bad Request - Invalid query parameters"),
@@ -100,18 +82,7 @@ class CrewViewSet(
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                "first_name",
-                type=OpenApiTypes.STR,
-                description="Filter by crew first name (ex. ?first_name=John)",
-            ),
-            OpenApiParameter(
-                "last_name",
-                type=OpenApiTypes.STR,
-                description="Filter by crew last name (ex. ?last_name=Doe)",
-            ),
-        ],
+        summary="Retrieve a list of crew members",
         responses={
             200: OpenApiResponse(response=CrewSerializer, description="Successful response with a list of crew members"),
             400: OpenApiResponse(description="Bad Request - Invalid query parameters"),
@@ -143,6 +114,7 @@ class AirplaneViewSet(viewsets.ModelViewSet):
         permission_classes=[IsAdminUser],
     )
     @extend_schema(
+        summary="Upload an image for a specific airplane",
         responses={
             200: OpenApiResponse(response=AirplaneImageSerializer, description="Image uploaded successfully"),
             400: OpenApiResponse(description="Bad Request - Invalid image data"),
@@ -162,13 +134,7 @@ class AirplaneViewSet(viewsets.ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                "airplane_type",
-                type=OpenApiTypes.INT,
-                description="Filter by airplane type id (ex. ?airplane_type=2)",
-            ),
-        ],
+        summary="Retrieve a list of airplanes",
         responses={
             200: OpenApiResponse(response=AirplaneListSerializer, description="Successful response with a list of airplanes"),
             400: OpenApiResponse(description="Bad Request - Invalid query parameters"),
@@ -192,18 +158,7 @@ class RouteViewSet(viewsets.ModelViewSet):
         return RouteSerializer
 
     @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                "source",
-                type=OpenApiTypes.INT,
-                description="Filter by source airport id (ex. ?source=1)",
-            ),
-            OpenApiParameter(
-                "destination",
-                type=OpenApiTypes.INT,
-                description="Filter by destination airport id (ex. ?destination=2)",
-            ),
-        ],
+        summary="Retrieve a list of routes",
         responses={
             200: OpenApiResponse(response=RouteListSerializer, description="Successful response with a list of routes"),
             400: OpenApiResponse(description="Bad Request - Invalid query parameters"),
@@ -236,47 +191,8 @@ class FlightViewSet(viewsets.ModelViewSet):
             return FlightDetailSerializer
         return FlightSerializer
 
-    def get_queryset(self):
-        """Retrieve the flights with filters"""
-        date = self.request.query_params.get("date")
-        airplane_id_str = self.request.query_params.get("airplane")
-        route_id_str = self.request.query_params.get("route")
-
-        queryset = self.queryset
-
-        if date:
-            date = datetime.strptime(date, "%Y-%m-%d").date()
-            queryset = queryset.filter(departure_time__date=date)
-
-        if airplane_id_str:
-            queryset = queryset.filter(airplane_id=int(airplane_id_str))
-
-        if route_id_str:
-            queryset = queryset.filter(route_id=int(route_id_str))
-
-        return queryset
-
     @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                "airplane",
-                type=OpenApiTypes.INT,
-                description="Filter by airplane id (ex. ?airplane=2)",
-            ),
-            OpenApiParameter(
-                "route",
-                type=OpenApiTypes.INT,
-                description="Filter by route id (ex. ?route=2)",
-            ),
-            OpenApiParameter(
-                "date",
-                type=OpenApiTypes.DATE,
-                description=(
-                    "Filter by datetime of Flight "
-                    "(ex. ?date=2022-10-23)"
-                ),
-            ),
-        ],
+        summary="Retrieve a list of flights",
         responses={
             200: OpenApiResponse(response=FlightListSerializer, description="Successful response with a list of flights"),
             400: OpenApiResponse(description="Bad Request - Invalid query parameters"),
@@ -317,18 +233,7 @@ class OrderViewSet(
         serializer.save(user=self.request.user)
 
     @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                "flight",
-                type=OpenApiTypes.INT,
-                description="Filter by flight id (ex. ?flight=1)",
-            ),
-            OpenApiParameter(
-                "date",
-                type=OpenApiTypes.DATE,
-                description="Filter by order date (ex. ?date=2023-10-23)",
-            ),
-        ],
+        summary="Retrieve a list of orders",
         responses={
             200: OpenApiResponse(response=OrderListSerializer, description="Successful response with a list of orders"),
             400: OpenApiResponse(description="Bad Request - Invalid query parameters"),
