@@ -2,7 +2,7 @@ from datetime import datetime
 
 from django.db.models import F, Count
 from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
@@ -38,6 +38,28 @@ class AirportViewSet(
     queryset = Airport.objects.all()
     serializer_class = AirportSerializer
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "name",
+                type=OpenApiTypes.STR,
+                description="Filter by airport name (ex. ?name=JFK)",
+            ),
+            OpenApiParameter(
+                "closest_big_city",
+                type=OpenApiTypes.STR,
+                description="Filter by closest big city (ex. ?closest_big_city=New York)",
+            ),
+        ],
+        responses={
+            200: OpenApiResponse(response=AirportSerializer, description="Successful response with a list of airports"),
+            400: OpenApiResponse(description="Bad Request - Invalid query parameters"),
+            401: OpenApiResponse(description="Unauthorized - Authentication credentials were not provided or are invalid"),
+        }
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
 
 class AirplaneTypeViewSet(
     mixins.CreateModelMixin,
@@ -47,6 +69,23 @@ class AirplaneTypeViewSet(
     queryset = AirplaneType.objects.all()
     serializer_class = AirplaneTypeSerializer
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "name",
+                type=OpenApiTypes.STR,
+                description="Filter by airplane type name (ex. ?name=Boeing 737)",
+            ),
+        ],
+        responses={
+            200: OpenApiResponse(response=AirplaneTypeSerializer, description="Successful response with a list of airplane types"),
+            400: OpenApiResponse(description="Bad Request - Invalid query parameters"),
+            401: OpenApiResponse(description="Unauthorized - Authentication credentials were not provided or are invalid"),
+        }
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
 
 class CrewViewSet(
     mixins.CreateModelMixin,
@@ -55,6 +94,28 @@ class CrewViewSet(
 ):
     queryset = Crew.objects.all()
     serializer_class = CrewSerializer
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "first_name",
+                type=OpenApiTypes.STR,
+                description="Filter by crew first name (ex. ?first_name=John)",
+            ),
+            OpenApiParameter(
+                "last_name",
+                type=OpenApiTypes.STR,
+                description="Filter by crew last name (ex. ?last_name=Doe)",
+            ),
+        ],
+        responses={
+            200: OpenApiResponse(response=CrewSerializer, description="Successful response with a list of crew members"),
+            400: OpenApiResponse(description="Bad Request - Invalid query parameters"),
+            401: OpenApiResponse(description="Unauthorized - Authentication credentials were not provided or are invalid"),
+        }
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 class AirplaneViewSet(viewsets.ModelViewSet):
@@ -75,6 +136,14 @@ class AirplaneViewSet(viewsets.ModelViewSet):
         url_path="upload-image",
         permission_classes=[IsAdminUser],
     )
+    @extend_schema(
+        responses={
+            200: OpenApiResponse(response=AirplaneImageSerializer, description="Image uploaded successfully"),
+            400: OpenApiResponse(description="Bad Request - Invalid image data"),
+            401: OpenApiResponse(description="Unauthorized - Authentication credentials were not provided or are invalid"),
+            403: OpenApiResponse(description="Forbidden - You do not have permission to perform this action"),
+        }
+    )
     def upload_image(self, request, pk=None):
         """Endpoint for uploading image to specific airplane"""
         airplane = self.get_object()
@@ -93,7 +162,12 @@ class AirplaneViewSet(viewsets.ModelViewSet):
                 type=OpenApiTypes.INT,
                 description="Filter by airplane type id (ex. ?airplane_type=2)",
             ),
-        ]
+        ],
+        responses={
+            200: OpenApiResponse(response=AirplaneListSerializer, description="Successful response with a list of airplanes"),
+            400: OpenApiResponse(description="Bad Request - Invalid query parameters"),
+            401: OpenApiResponse(description="Unauthorized - Authentication credentials were not provided or are invalid"),
+        }
     )
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
@@ -121,7 +195,12 @@ class RouteViewSet(viewsets.ModelViewSet):
                 type=OpenApiTypes.INT,
                 description="Filter by destination airport id (ex. ?destination=2)",
             ),
-        ]
+        ],
+        responses={
+            200: OpenApiResponse(response=RouteListSerializer, description="Successful response with a list of routes"),
+            400: OpenApiResponse(description="Bad Request - Invalid query parameters"),
+            401: OpenApiResponse(description="Unauthorized - Authentication credentials were not provided or are invalid"),
+        }
     )
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
@@ -187,7 +266,12 @@ class FlightViewSet(viewsets.ModelViewSet):
                     "(ex. ?date=2022-10-23)"
                 ),
             ),
-        ]
+        ],
+        responses={
+            200: OpenApiResponse(response=FlightListSerializer, description="Successful response with a list of flights"),
+            400: OpenApiResponse(description="Bad Request - Invalid query parameters"),
+            401: OpenApiResponse(description="Unauthorized - Authentication credentials were not provided or are invalid"),
+        }
     )
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
@@ -234,7 +318,12 @@ class OrderViewSet(
                 type=OpenApiTypes.DATE,
                 description="Filter by order date (ex. ?date=2023-10-23)",
             ),
-        ]
+        ],
+        responses={
+            200: OpenApiResponse(response=OrderListSerializer, description="Successful response with a list of orders"),
+            400: OpenApiResponse(description="Bad Request - Invalid query parameters"),
+            401: OpenApiResponse(description="Unauthorized - Authentication credentials were not provided or are invalid"),
+        }
     )
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
