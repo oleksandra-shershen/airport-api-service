@@ -4,11 +4,11 @@ The Airport API Service is designed to track flights from airports across the gl
 
 ## Installation & Run
 
-### Prerequisites
-Python 3.8+
-Docker Desktop
+### Prerequisites:
+* Python 3.8+
+* Docker Desktop
 
-### Set enviroment variable
+### Set enviroment variable:
 - Copy and rename the **.env.sample** file to **.env** 
 - Open the .env file and edit the environment variables 
 - Save the .env file securely 
