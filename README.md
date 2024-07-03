@@ -2,6 +2,14 @@
 ## Introduction
 The Airport API Service is designed to track flights from airports across the globe. The system includes features for managing airports, routes, airplanes, flights, crews, tickets, and orders. The provided database structure allows for efficient tracking and management of these entities.
 
+### Features:
+* JWT Authenticated
+* Admin panel /admin/
+* Swagger documentation
+* Managing orders and tickets
+* Docker
+* Uploading files
+
 ## Installation & Run
 
 ### Prerequisites:
@@ -38,11 +46,4 @@ docker-compose exec -it airport /bin/sh
 python manage.py createsuperuser
 ```
 
-### Go to site [http://localhost:8001/](http://localhost:8001/)
-
-### Features:
-* JWT Authenticated
-* Admin panel /admin/
-* Documentation located in api/doc/swagger/
-* Managing orders and tickets
-* 
+Go to site [http://localhost:8001/](http://localhost:8001/)
