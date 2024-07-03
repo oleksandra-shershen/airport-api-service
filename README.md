@@ -2,7 +2,7 @@
 ## Introduction
 The Airport API Service is designed to track flights from airports across the globe. The system includes features for managing airports, routes, airplanes, flights, crews, tickets, and orders. The provided database structure allows for efficient tracking and management of these entities.
 
-### Features:
+## Features:
 * JWT Authenticated
 * Admin panel /admin/
 * Swagger documentation
